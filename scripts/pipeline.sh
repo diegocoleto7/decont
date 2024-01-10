@@ -14,9 +14,19 @@ else
 	echo "Skip filtering operation."
 fi
 
+# Verificar si el directorio contaminants_idx existe, si no, crearlo
+if [ ! -d "res/contaminants_idx" ]; then
+    mkdir -p "res/contaminants_idx"
+fi
 
-# Index the contaminants file
-bash scripts/index.sh res/contaminants.fasta res/contaminants_idx
+
+# Indexar los contaminantes
+if [ -n "$(ls -A res/contaminants_idx/ )" ]; then
+    echo "Skip indexing operation"
+else
+	bash scripts/index.sh res/contaminants.fasta res/contaminants_idx
+fi
+
 
 # Merge the samples into a single file
 for sid in $(<list_of_sample_ids>) #TODO
