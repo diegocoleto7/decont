@@ -1,9 +1,19 @@
+
 # Sustitución del bucle de descarga por una linea con wget.
 wget -i data/urls -P data/
 
-# Download the contaminants fasta file, uncompress it, and
-# filter to remove all small nuclear RNAs
-bash scripts/download.sh <contaminants_url> res yes #TODO
+
+# Variable para la descarga de contaminantes
+contaminants_url="https://bioinformatics.cnio.es/data/courses/decont/contaminants.fasta.gz"
+
+
+# Descargar contaminantes y filtrarlos
+if [ ! -e "res/contaminants.fasta" ]; then
+	bash scripts/download.sh "$contaminants_url" res yes
+else
+	echo "Skip filtering operation."
+fi
+
 
 # Index the contaminants file
 bash scripts/index.sh res/contaminants.fasta res/contaminants_idx
