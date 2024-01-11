@@ -1,0 +1,12 @@
+name: decontenv
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - fastqc
+  - star
+  - ca-certificates
+  - openssl
+  - seqkit
+  - cutadapt
+prefix: /home/vant/miniforge3/envs/decontenv
