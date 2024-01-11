@@ -86,10 +86,32 @@ else
 		--readFilesCommand gunzip -c --outFileNamePrefix "out/star/$sampleid/"
 	done
 fi
- 
 
-# TODO: create a log file containing information from cutadapt and star logs
-# (this should be a single log file, and information should be *appended* to it on each run)
-# - cutadapt: Reads with adapters and total basepairs
-# - star: Percentages of uniquely mapped reads, reads mapped to multiple loci, and to too many loci
-# tip: use grep to filter the lines you're interested in
+ 
+# Creación del archivo.log con la información resumida.
+if [ -e "log/pipeline.log" ]; then
+    echo "Skip pipeline.log operation."
+else
+    touch "log/pipeline.log"
+
+	# Extraer líneas de archivos en log/cutadapt/
+	for file in log/cutadapt/*; do
+	    if [ -f "$file" ]; then
+		echo "Archivo: $file" >> "log/pipeline.log"
+		grep -E "Total basepairs processed|Reads with adapters" "$file" >> "log/pipeline.log"
+		echo "----------------------------------------------------" >> "log/pipeline.log"
+	    fi
+	done
+
+	# Extraer líneas de archivos log.final.out en out/star/ls/
+	for dir in out/star/*; do
+	    if [ -d "$dir" ]; then
+		file="$dir/Log.final.out"
+		if [ -f "$file" ]; then
+		    echo "Archivo: $file" >> "log/pipeline.log"
+		    grep -E "Uniquely mapped reads %|% of reads mapped to multiple loci|% of reads mapped to too many loci" "$file" >> "log/pipeline.log"
+		    echo "----------------------------------------------------" >> "log/pipeline.log"
+		fi
+	    fi
+	done
+fi
