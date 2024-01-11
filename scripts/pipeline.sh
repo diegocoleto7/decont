@@ -66,16 +66,27 @@ else
 fi
 
 
-# TODO: run STAR for all trimmed files
-for fname in out/trimmed/*.fastq.gz
-do
-    # you will need to obtain the sample ID from the filename
-    sid=#TODO
-    # mkdir -p out/star/$sid
-    # STAR --runThreadN 4 --genomeDir res/contaminants_idx \
-    #    --outReadsUnmapped Fastx --readFilesIn <input_file> \
-    #    --readFilesCommand gunzip -c --outFileNamePrefix <output_directory>
-done 
+# Verificar si el directorio star existe, si no, crearlo
+if [ ! -d "out/star" ]; then
+    mkdir -p "out/star"
+fi
+
+# Star para los archivos sin adaptadores, creando sus directorios correspondientes
+if [ -n "$(ls -A out/star/ )" ]; then
+    echo "Skip star operation"
+else
+	for fname in out/trimmed/*.fastq.gz; do
+	  sampleid=$(basename "$fname" .trimmed.fastq.gz)
+	  if [ ! -d "out/star/$sampleid" ]; then
+		mkdir -p "out/star/$sampleid"
+	  fi
+
+	  STAR --runThreadN 4 --genomeDir res/contaminants_idx \
+		--outReadsUnmapped Fastx --readFilesIn "$fname" \
+		--readFilesCommand gunzip -c --outFileNamePrefix "out/star/$sampleid/"
+	done
+fi
+ 
 
 # TODO: create a log file containing information from cutadapt and star logs
 # (this should be a single log file, and information should be *appended* to it on each run)
