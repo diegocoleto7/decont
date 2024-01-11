@@ -27,12 +27,23 @@ else
 	bash scripts/index.sh res/contaminants.fasta res/contaminants_idx
 fi
 
+# Verificar si el directorio merged existe, si no, crearlo
+if [ ! -d "out/merged" ]; then
+    mkdir -p "out/merged"
+fi
 
-# Merge the samples into a single file
-for sid in $(<list_of_sample_ids>) #TODO
-do
-    bash scripts/merge_fastqs.sh data out/merged $sid
-done
+
+# Unir los datos en un solo archivo.
+
+if [ -n "$(ls -A out/merged/ )" ]; then
+    echo "Skip merging operation"
+else
+    for sid in $(ls data/*.fastq.gz | cut -d "." -f1 | sed 's:data/::' | sort | uniq); do
+    	bash scripts/merge_fastqs.sh data out/merged $sid
+	done
+
+fi
+
 
 # TODO: run cutadapt for all merged files
 # cutadapt -m 18 -a TGGAATTCTCGGGTGCCAAGG --discard-untrimmed \
