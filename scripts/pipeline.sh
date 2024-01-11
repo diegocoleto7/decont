@@ -44,10 +44,27 @@ else
 
 fi
 
+# Verificar si el directorio trimmed y cutadapt existen, si no, crearlos
+if [ ! -d "out/trimmed" ]; then
+    mkdir -p "out/trimmed"
+fi
 
-# TODO: run cutadapt for all merged files
-# cutadapt -m 18 -a TGGAATTCTCGGGTGCCAAGG --discard-untrimmed \
-#     -o <trimmed_file> <input_file> > <log_file>
+if [ ! -d "log/cutadapt" ]; then
+    mkdir -p "log/cutadapt"
+fi
+
+
+# Cutadapt para los archivos unidos y guardados en merged
+if [ -n "$(ls -A log/cutadapt/ )" ]; then
+    echo "Skip cutadapt operation"
+else
+	for file in out/merged/*.fastq.gz; do
+	  file=$(basename "$file" .fastq.gz)
+	  cutadapt -m 18 -a TGGAATTCTCGGGTGCCAAGG --discard-untrimmed \
+		-o out/trimmed/"$file".trimmed.fastq.gz out/merged/"$file".fastq.gz > log/cutadapt/"$file".log
+	done
+fi
+
 
 # TODO: run STAR for all trimmed files
 for fname in out/trimmed/*.fastq.gz
