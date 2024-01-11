@@ -3,6 +3,27 @@
 wget -i data/urls -P data/
 
 
+# Md5 checks
+while read url; do
+    file_name=$(basename "$url")
+    local_file_path="data/${file_name}"
+    md5_url="${url}.md5"
+
+    if [ -e "$local_file_path" ]; then
+        computed_md5=$(md5sum "$local_file_path" | awk '{print $1}')
+        expected_md5=$(curl -sS "$md5_url" | awk '{print $1}')
+
+        if [ "$computed_md5" == "$expected_md5" ]; then
+            echo "MD5 checksum for $file_name is valid."
+        else
+            echo "MD5 checksum for $file_name is INVALID."
+        fi
+    else
+        echo "File $file_name not found."
+    fi
+done < "data/urls"
+
+
 # Variable para la descarga de contaminantes
 contaminants_url="https://bioinformatics.cnio.es/data/courses/decont/contaminants.fasta.gz"
 
